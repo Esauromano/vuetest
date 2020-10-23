@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vanglar App"/>
+    
     <button @click="logout">Logout</button>
   </div>
 </template>
