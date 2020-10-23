@@ -13,7 +13,7 @@ const config = {
   storageBucket: "vanglar-fa637.appspot.com",
   messagingSenderId: "928614680684",
   appId: "1:928614680684:web:388c7e080da898dc253049"
-};
+}
 
 firebase.initializeApp(config)
 
