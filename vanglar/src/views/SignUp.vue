@@ -27,7 +27,7 @@
     },
     methods: {
       signup: function() {
-        firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
+        firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
           () => {
             this.$router.replace('home')
           },
