@@ -8,6 +8,14 @@ Vue.use(VueRouter)
 
 const routes = [
   {
+    path: '*',
+    redirect: '/login'
+  },
+  {
+    path: '/',
+    redirect: '/login'
+  },
+  {
     path: '/login',
     name: 'Login',
     component: Login
@@ -24,14 +32,6 @@ const routes = [
     meta:{
       requiresAuth:true
     }
-  },
-  {
-    path: '/*',
-    redirect: '/login'
-  },
-  {
-    path: '/',
-    redirect: '/login'
   }
 ]
 
