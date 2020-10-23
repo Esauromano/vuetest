@@ -16,8 +16,13 @@ const config = {
 }
 
 firebase.initializeApp(config)
-
-new Vue({
-  router,
-  render: h => h(App)
-}).$mount('#app')
+let app = ''
+firebase.auth().onAuthStateChanged(() => {
+  if (!app) {
+    /* eslint-disable no-new */
+    app = new Vue({
+      router,
+      render: h => h(App)
+    }).$mount('#app');
+  }
+});
