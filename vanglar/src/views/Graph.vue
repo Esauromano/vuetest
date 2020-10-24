@@ -3,7 +3,7 @@
     <h1>This is an about page</h1>
     <button @click="calldocs">Load data</button>
     <ul id="example-1">
-      <li v-for="item in trues" :key="item.answer+item.timestamp">
+      <li v-for="item in docs" :key="item.answer+item.timestamp">
         {{ item.right }} - {{ item.date }}
       </li>
     </ul>
@@ -21,7 +21,7 @@ const db = firebase.database()
         falses: [],
         trues:[],
         dates: [],
-        values: {}
+        values: []
       }
     },
     firebase: {
@@ -40,40 +40,41 @@ const db = firebase.database()
             var returnArr = []
             var dates = []
             var values = []
-            var cuenta = []
+            var cuenta = {}
+            var ver = []
+            var fal = []
             snapshot.forEach(function(childSnapshot) {
               var item = childSnapshot.val()
-              values[new Date(item.timestamp)]=[]
+              values[moment(new Date(item.timestamp)).format("Do MMM YYYY")]=[]
+              cuenta[moment(new Date(item.timestamp)).format("Do MMM YYYY")]=[]
             });
+            console.log(values)
             snapshot.forEach(function(childSnapshot) {
                 var item = childSnapshot.val()
                 item.key = childSnapshot.key // The 0 there is the key, which sets the date to the epoch
                 item.date = moment(new Date(item.timestamp)).format("Do MMM YYYY")
 
                 returnArr.push(item)
-                dates.push(new Date(item.timestamp))
-                values[new Date(item.timestamp)].push(item.right)
+                dates.push(moment(new Date(item.timestamp)).format("Do MMM YYYY"))
+                values[item.date].push(item.right)
             });
-            snapshot.forEach(function(childSnapshot) {
-              var item = childSnapshot.val()
-              
-              cuenta.push(values[new Date(item.timestamp)].reduce((acc, e) => acc.set(e, (acc.get(e) || 0) + 1), new Map()))
-              
+            console.log(values)
+            let setDates = new Set(dates)
+            this.dates = setDates
+            setDates.forEach(function(item) {
+              cuenta[item] = [values[item].reduce((acc, e) => acc.set(e, (acc.get(e) || 0) + 1), new Map()).get(true),values[item].reduce((acc, e) => acc.set(e, (acc.get(e) || 0) + 1), new Map()).get(false)]
+              ver.push(values[item].reduce((acc, e) => acc.set(e, (acc.get(e) || 0) + 1), new Map()).get(true))
+              fal.push(values[item].reduce((acc, e) => acc.set(e, (acc.get(e) || 0) + 1), new Map()).get(false))
             });
             this.docs = returnArr
-            this.dates = new Set(dates)
-            console.log('dates', dates.length)
-            console.log('dates this', this.dates.length)
+            
+            this.values = cuenta
+            console.log('dates', this.dates.length)
             console.log('values', values.length)
-            console.log('values this', this.values.length)
 
-            console.log('cuenta', cuenta.length)
-            this.trues = returnArr.filter(
-              x=>x.right === true
-            )
-            this.falses = returnArr.filter(
-              x=>x.right === false
-            )
+            console.log('cuenta', cuenta)
+            this.trues = ver
+            this.falses = fal
           }
         )
       }
