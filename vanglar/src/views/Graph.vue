@@ -1,7 +1,7 @@
 <template>
   <div class="graph">
-    <h1>This is an about page</h1>
     <button @click="calldocs">Load data</button>
+    <reactive-bar-chart :chart-data="chartdata"></reactive-bar-chart>
     <ul id="example-1">
       <li v-for="item in docs" :key="item.answer+item.timestamp">
         {{ item.right }} - {{ item.date }}
@@ -12,16 +12,21 @@
 <script>
 import firebase from 'firebase'
 import moment from 'moment'
+import ReactiveBarChart from '../components/bar.js'
 const db = firebase.database()
   export default {
     name: 'Graph',
+    components: {
+      ReactiveBarChart
+    },
     data() {
       return {
         docs: {},
         falses: [],
         trues:[],
         dates: [],
-        values: []
+        values: [],
+        chartdata:{}
       }
     },
     firebase: {
@@ -32,6 +37,9 @@ const db = firebase.database()
           console.error(err);
         }
       }
+    },
+    beforeMount(){
+        this.calldocs()
     },
     methods: {
       calldocs: function() {
@@ -59,7 +67,7 @@ const db = firebase.database()
                 values[item.date].push(item.right)
             });
             console.log(values)
-            let setDates = new Set(dates)
+            let setDates = Array.from(new Set(dates))
             this.dates = setDates
             setDates.forEach(function(item) {
               cuenta[item] = [values[item].reduce((acc, e) => acc.set(e, (acc.get(e) || 0) + 1), new Map()).get(true),values[item].reduce((acc, e) => acc.set(e, (acc.get(e) || 0) + 1), new Map()).get(false)]
@@ -73,8 +81,36 @@ const db = firebase.database()
             console.log('values', values.length)
 
             console.log('cuenta', cuenta)
-            this.trues = ver
-            this.falses = fal
+            let chartdata = {
+              type: 'bar', 
+              datasets: [
+                {
+                  label: 'Trues',
+                  backgroundColor: '#f87979',
+                  data: []
+                },
+                {
+                  label: 'Falses',
+                  backgroundColor: '#7979f8',
+                  data: []
+                }
+              ],
+              labels:[],
+              options: {
+                  scales: {
+                      xAxes: [{
+                          stacked: true
+                      }],
+                      yAxes: [{
+                          stacked: true
+                      }]
+                  }
+              }
+            }
+            chartdata.datasets[0].data = ver
+            chartdata.datasets[1].data = fal
+            chartdata.labels = setDates
+            this.chartdata = chartdata
           }
         )
       }
